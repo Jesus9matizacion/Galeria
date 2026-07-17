@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedagogía de Freire | Presentación tipo Prezi</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --bg-2: #10233c;
+      --panel: rgba(11, 18, 33, 0.72);
+      --panel-strong: rgba(14, 22, 41, 0.88);
+      --text: #f5f7fb;
+      --muted: #c1cedf;
+      --accent: #f3b84b;
+      --accent-2: #7dd3fc;
+      --accent-3: #8b5cf6;
+      --line: rgba(255, 255, 255, 0.12);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --ease: cubic-bezier(.2,.9,.2,1);
+      --camera-x: 0px;
+      --camera-y: 0px;
+      --camera-scale: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(125, 211, 252, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(243, 184, 75, 0.16), transparent 24%),
+        radial-gradient(circle at 60% 80%, rgba(139, 92, 246, 0.16), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 64px 64px;
+      opacity: 0.35;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hud {
+      position: fixed;
+      z-index: 40;
+      left: 20px;
+      right: 20px;
+      top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      pointer-events: none;
+    }
+
+    .brand,
+    .controls,
+    .caption {
+      pointer-events: auto;
+    }
+
+    .brand {
+      max-width: min(480px, 100%);
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(8, 17, 31, 0.66);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+      letter-spacing: 0.02em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(8, 17, 31, 0.66);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+      min-width: 52px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 180ms var(--ease), background 180ms var(--ease), border-color 180ms var(--ease);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(243, 184, 75, 0.5);
+      background: linear-gradient(135deg, rgba(243,184,75,0.22), rgba(255,255,255,0.06));
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .status {
+      min-width: 130px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .stage-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      perspective: 1800px;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      transform: translate3d(var(--camera-x), var(--camera-y), 0) scale(var(--camera-scale));
+      transform-origin: 50vw 50vh;
+      transition: transform 900ms var(--ease);
+    }
+
+    .frame {
+      position: absolute;
+      width: min(520px, 84vw);
+      border-radius: var(--radius-xl);
+      padding: 24px 24px 22px;
+      background: linear-gradient(180deg, rgba(19, 31, 54, 0.92), rgba(10, 17, 31, 0.84));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 700ms var(--ease), transform 700ms var(--ease), border-color 700ms var(--ease), box-shadow 700ms var(--ease), visibility 0s linear 700ms;
+    }
+
+    .frame.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      border-color: rgba(243, 184, 75, 0.55);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+      transition: opacity 700ms var(--ease), transform 700ms var(--ease), border-color 700ms var(--ease), box-shadow 700ms var(--ease), visibility 0s;
+    }
+
+    .frame h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.4rem, 2.2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .frame h3 {
+      margin: 18px 0 10px;
+      font-size: 1.02rem;
+      color: #fff4d6;
+    }
+
+    .frame p,
+    .frame li {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.98rem;
+    }
+
+    .frame ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(243, 184, 75, 0.12);
+      border: 1px solid rgba(243, 184, 75, 0.24);
+      color: #ffe4aa;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .hero {
+      width: min(680px, 88vw);
+      padding: 30px 30px 26px;
+    }
+
+    .hero .title {
+      font-size: clamp(2.1rem, 4vw, 4.2rem);
+      line-height: 0.95;
+      margin: 0 0 14px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero .lead {
+      font-size: 1.05rem;
+      max-width: 54ch;
+    }
+
+    .path {
+      position: absolute;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(125, 211, 252, 0.55), rgba(243, 184, 75, 0.45), rgba(139, 92, 246, 0.5));
+      filter: blur(0.2px);
+      opacity: 0.35;
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .node {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.95);
+      background: var(--accent);
+      box-shadow: 0 0 0 10px rgba(243,184,75,0.12);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .node.secondary {
+      background: var(--accent-2);
+      box-shadow: 0 0 0 10px rgba(125,211,252,0.12);
+    }
+
+    .node.tertiary {
+      background: var(--accent-3);
+      box-shadow: 0 0 0 10px rgba(139,92,246,0.12);
+    }
+
+    .caption {
+      position: fixed;
+      left: 20px;
+      bottom: 18px;
+      z-index: 40;
+      max-width: min(560px, calc(100vw - 40px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(8, 17, 31, 0.68);
+      backdrop-filter: blur(18px);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .caption strong {
+      color: var(--text);
+    }
+
+    .pulse {
+      position: fixed;
+      inset: 0;
+      border-radius: 999px;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.94);
+      background: radial-gradient(circle, rgba(243,184,75,0.18), transparent 58%);
+      transition: opacity 450ms var(--ease), transform 450ms var(--ease);
+      z-index: 1;
+    }
+
+    .pulse.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @media (max-width: 720px) {
+      html,
+      body {
+        overflow: hidden;
+      }
+
+      .hud {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        flex-direction: column;
+      }
+
+      .controls {
+        width: fit-content;
+        padding: 10px;
+      }
+
+      .brand {
+        padding: 12px 14px;
+      }
+
+      .frame {
+        width: min(94vw, 560px);
+        padding: 20px;
+      }
+
+      .hero {
+        width: min(94vw, 560px);
+      }
+
+      .caption {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="hud">
+      <div class="brand">
+        <h1>Pedagogía de Freire</h1>
+        <p>Presentación tipo Prezi con zoom, recorrido guiado y narración por voz para exponer protagonistas, fundamentos teóricos e impacto social.</p>
+      </div>
+      <div class="controls">
+        <button id="prevBtn" aria-label="Anterior">◀</button>
+        <button id="nextBtn" aria-label="Siguiente">▶</button>
+        <button id="playBtn" aria-label="Narrar">Narrar</button>
+        <button id="muteBtn" aria-label="Silenciar">Audio: ON</button>
+        <div class="status" id="status">1 / 5</div>
+      </div>
+    </div>
+
+    <div class="stage-wrap">
+      <div class="pulse" id="pulse"></div>
+      <div class="stage" id="stage" aria-live="polite">
+        <div class="path" style="left: 20%; top: 32%; width: 360px; height: 8px; transform: rotate(18deg);"></div>
+        <div class="path" style="left: 44%; top: 30%; width: 320px; height: 8px; transform: rotate(-30deg);"></div>
+        <div class="path" style="left: 50%; top: 55%; width: 380px; height: 8px; transform: rotate(16deg);"></div>
+        <div class="path" style="left: 26%; top: 62%; width: 280px; height: 8px; transform: rotate(-24deg);"></div>
+
+        <div class="node" style="left: 50%; top: 50%;"></div>
+        <div class="node secondary" style="left: 26%; top: 30%;"></div>
+        <div class="node tertiary" style="left: 74%; top: 28%;"></div>
+        <div class="node secondary" style="left: 25%; top: 71%;"></div>
+        <div class="node tertiary" style="left: 73%; top: 73%;"></div>
+
+        <section class="frame hero" data-index="0" data-x="50" data-y="50" data-scale="1.1">
+          <div class="badge">Paulo Freire | educación transformadora</div>
+          <h2 class="title">Leer el mundo<br />para escribir la propia historia</h2>
+          <p class="lead">
+            Esta presentación recorre el pensamiento de Freire como una invitación a
+            reemplazar la enseñanza vertical por el diálogo, la conciencia crítica y la
+            autonomía del educando.
+          </p>
+          <h3>Ruta de la exposición</h3>
+          <ul>
+            <li>Protagonistas: educando, educador y relación opresor-oprimido.</li>
+            <li>Fundamentos teóricos: pedagogía del oprimido y de la autonomía.</li>
+            <li>Impacto: alfabetización, ciudadanía crítica e inclusión del contexto.</li>
+          </ul>
+        </section>
+
+        <section class="frame" data-index="1" data-x="23" data-y="27" data-scale="0.94">
+          <div class="badge">1. Protagonistas</div>
+          <h2>El aula deja de ser un lugar de imposición</h2>
+          <p>
+            Freire cambia las relaciones de poder tradicionales y entiende la educación como
+            un proceso compartido, donde cada persona aporta experiencia, lenguaje y lectura
+            de la realidad.
+          </p>
+          <h3>Educando y educador</h3>
+          <ul>
+            <li>El educando no recibe datos: participa, pregunta y construye sentido.</li>
+            <li>El educador guía el aprendizaje y también aprende en el intercambio.</li>
+            <li>El diálogo horizontal reemplaza la autoridad cerrada.</li>
+          </ul>
+          <h3>Oprimidos y opresores</h3>
+          <ul>
+            <li>La opresión deshumaniza al imponer voluntad y silencio.</li>
+            <li>La liberación nace de la toma de conciencia y la acción colectiva.</li>
+          </ul>
+        </section>
+
+        <section class="frame" data-index="2" data-x="76" data-y="26" data-scale="0.94">
+          <div class="badge">2. Pedagogía del Oprimido</div>
+          <h2>Liberación, diálogo y concientización</h2>
+          <p>
+            Freire critica la educación bancaria, donde el maestro deposita contenidos en
+            estudiantes vistos como recipientes vacíos. Frente a eso propone una educación
+            problematizadora que parte de la vida real.
+          </p>
+          <h3>Ideas clave</h3>
+          <ul>
+            <li>La realidad del estudiante es el punto de partida del contenido.</li>
+            <li>El aprendizaje ocurre mediante diálogo bidireccional.</li>
+            <li>La concientización permite reconocer estructuras de opresión.</li>
+          </ul>
+          <p>
+            La meta no es repetir respuestas, sino comprender y transformar el mundo.
+          </p>
+        </section>
+
+        <section class="frame" data-index="3" data-x="25" data-y="76" data-scale="0.94">
+          <div class="badge">3. Pedagogía de la Autonomía</div>
+          <h2>Enseñar es crear condiciones para que el otro produzca saber</h2>
+          <p>
+            Aquí la ética docente se vuelve central: la enseñanza ya no es transferencia
+            mecánica, sino una práctica que despierta curiosidad, rigor y respeto.
+          </p>
+          <h3>Principios</h3>
+          <ul>
+            <li>Saber enseñar es habilitar al estudiante para pensar por sí mismo.</li>
+            <li>La rigurosidad metódica fortalece una curiosidad crítica.</li>
+            <li>El ejemplo del docente debe coincidir con su discurso.</li>
+            <li>La autonomía del educando exige respeto por tiempos, identidad y cultura.</li>
+          </ul>
+        </section>
+
+        <section class="frame" data-index="4" data-x="78" data-y="75" data-scale="0.94">
+          <div class="badge">4. Impacto social</div>
+          <h2>Educar para actuar sobre la realidad</h2>
+          <p>
+            La propuesta freireana no se queda en la teoría: alfabetiza, democratiza el aula
+            y forma ciudadanía crítica. Aprender a leer es también aprender a leer el mundo.
+          </p>
+          <h3>Consecuencias</h3>
+          <ul>
+            <li>Alfabetización como liberación y acceso a la palabra propia.</li>
+            <li>Participación comunitaria en decisiones educativas.</li>
+            <li>Formación de ciudadanos que reflexionan y actúan.</li>
+            <li>Diseño curricular atento al contexto local: pobreza, cultura y desigualdad.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <div class="caption" id="caption">
+      <strong>Consejo:</strong> usa las flechas o la barra espaciadora para moverte. Pulsa
+      <strong>Narrar</strong> para escuchar la explicación de cada parte.
+    </div>
+  </div>
+
+  <script>
+    const frames = Array.from(document.querySelectorAll(".frame"));
+    const stage = document.getElementById("stage");
+    const status = document.getElementById("status");
+    const caption = document.getElementById("caption");
+    const pulse = document.getElementById("pulse");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playBtn = document.getElementById("playBtn");
+    const muteBtn = document.getElementById("muteBtn");
+
+    const narrations = [
+      "Bienvenidas y bienvenidos. Esta presentación recorre la pedagogía de Paulo Freire como una experiencia visual y auditiva. La idea central es leer el mundo para transformar la realidad.",
+      "En los protagonistas, el educando deja de ser pasivo y se vuelve un sujeto activo. El educador no impone, sino que facilita el diálogo. Y la relación opresor-oprimido muestra que la liberación es un proceso colectivo.",
+      "La pedagogía del oprimido rechaza la educación bancaria. En su lugar propone una educación problematizadora, basada en la vida real del estudiante, el diálogo horizontal y la concientización crítica.",
+      "La pedagogía de la autonomía resalta que enseñar no es transferir conocimiento. El docente crea condiciones para que el estudiante construya saber, con rigurosidad, coherencia y respeto por su identidad.",
+      "El impacto social es profundo: alfabetización como liberación, escuela democrática, ciudadanía crítica e inclusión del contexto local. Freire convierte la educación en una herramienta de transformación."
+    ];
+
+    let current = 0;
+    let speechEnabled = true;
+    let audioContext = null;
+
+    frames.forEach((frame) => {
+      frame.style.left = `${frame.dataset.x}vw`;
+      frame.style.top = `${frame.dataset.y}vh`;
+    });
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
+    function clickTone(type = "move") {
+      if (!speechEnabled) return;
+      ensureAudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = type === "move" ? "sine" : "triangle";
+      oscillator.frequency.value = type === "move" ? 640 : 420;
+      gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.07, audioContext.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.18);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.2);
+    }
+
+    function speak(index) {
+      if (!speechEnabled || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(narrations[index]);
+      utterance.lang = "es-ES";
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1;
+
+      const voices = window.speechSynthesis.getVoices();
+      const spanishVoice = voices.find((voice) => /es/i.test(voice.lang) && /female|mujer|google/i.test(voice.name))
+        || voices.find((voice) => /es/i.test(voice.lang))
+        || voices[0];
+
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function updateCamera() {
+      const frame = frames[current];
+      const x = parseFloat(frame.dataset.x);
+      const y = parseFloat(frame.dataset.y);
+      const scale = parseFloat(frame.dataset.scale || "1");
+      const cameraScale = 1.22 / scale;
+      const translateX = `${(50 - x) * window.innerWidth / 100}px`;
+      const translateY = `${(50 - y) * window.innerHeight / 100}px`;
+
+      document.documentElement.style.setProperty("--camera-x", translateX);
+      document.documentElement.style.setProperty("--camera-y", translateY);
+      document.documentElement.style.setProperty("--camera-scale", cameraScale);
+
+      frames.forEach((item, index) => item.classList.toggle("active", index === current));
+      status.textContent = `${current + 1} / ${frames.length}`;
+      caption.innerHTML = `<strong>${titles[current]}.</strong> ${captions[current]}`;
+      pulse.classList.add("show");
+      window.setTimeout(() => pulse.classList.remove("show"), 320);
+    }
+
+    const titles = [
+      "Introducción",
+      "Protagonistas",
+      "Pedagogía del Oprimido",
+      "Pedagogía de la Autonomía",
+      "Impacto social"
+    ];
+
+    const captions = [
+      "El recorrido parte de una idea simple: la educación se vuelve liberadora cuando dialoga con la realidad.",
+      "Freire redefine el vínculo entre quien aprende y quien enseña.",
+      "La crítica a la educación bancaria abre paso al pensamiento problematizador.",
+      "La autonomía docente y estudiantil se construye con ética, coherencia y respeto.",
+      "La pedagogía freireana se proyecta sobre ciudadanía, democracia e inclusión."
+    ];
+
+    function goTo(index) {
+      current = (index + frames.length) % frames.length;
+      updateCamera();
+      clickTone("move");
+      speak(current);
+    }
+
+    function toggleNarration() {
+      speechEnabled = !speechEnabled;
+      muteBtn.textContent = speechEnabled ? "Audio: ON" : "Audio: OFF";
+      if (!speechEnabled) {
+        window.speechSynthesis.cancel();
+      } else {
+        speak(current);
+      }
+    }
+
+    prevBtn.addEventListener("click", () => goTo(current - 1));
+    nextBtn.addEventListener("click", () => goTo(current + 1));
+    playBtn.addEventListener("click", () => {
+      speechEnabled = true;
+      muteBtn.textContent = "Audio: ON";
+      ensureAudioContext();
+      speak(current);
+      clickTone("play");
+    });
+    muteBtn.addEventListener("click", toggleNarration);
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        goTo(current + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        goTo(current - 1);
+      }
+      if (event.key.toLowerCase() === "n") {
+        toggleNarration();
+      }
+    });
+
+    window.addEventListener("resize", updateCamera);
+
+    frames.forEach((frame) => {
+      frame.addEventListener("click", () => {
+        goTo(Number(frame.dataset.index));
+      });
+    });
+
+    window.speechSynthesis?.addEventListener?.("voiceschanged", () => {
+      if (speechEnabled) {
+        speak(current);
+      }
+    });
+
+    updateCamera();
+    setTimeout(() => {
+      speak(0);
+    }, 550);
+  </script>
+</body>
+</html>
